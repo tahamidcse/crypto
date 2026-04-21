@@ -18,12 +18,19 @@ for n_neighbors in neighbors_settings:
     # build the model
     clf = KNeighborsClassifier(n_neighbors=n_neighbors)
     clf.fit(X_train, y_train)
+    ypred=clf.predict(X_train)
+    ymean=y_train.mean()
+    ssrf=((y_train-ypred)**2).sum()
+    ssrm=(((y_train-ymean)**2).sum())
+    r2=1-(ssrf/ssrm)
+    print(f"neighb={n_neighbors},r2={r2}")
     
     # record training set accuracy
     training_accuracy.append(clf.score(X_train, y_train))
     
     # record generalization accuracy
     test_accuracy.append(clf.score(X_test, y_test))
+    
 
 plt.plot(neighbors_settings, training_accuracy, label="training accuracy")
 plt.plot(neighbors_settings, test_accuracy, label="test accuracy")
@@ -31,3 +38,65 @@ plt.ylabel("Accuracy")
 plt.xlabel("n_neighbors")
 plt.legend()
 plt.show()  # optional: displays the plot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+cancer = load_breast_cancer()
+X_train, X_test, y_train, y_test = train_test_split(
+    cancer.data, cancer.target, stratify=cancer.target, random_state=66
+)
+
+training_accuracy = []
+test_accuracy = []
+
+# try different values of C (inverse of regularization strength)
+c_values = [0.01, 0.1, 1, 10, 100]
+
+for C in c_values:
+    clf = LogisticRegression(C=C, max_iter=10000)
+    clf.fit(X_train, y_train)
+    ypred=clf.predict(X_train)
+    ymean=y_train.mean()
+    ssrf=((y_train-ypred)**2).sum()
+    ssrm=(((y_train-ymean)**2).sum())
+    r2=1-(ssrf/ssrm)
+    print(f"cval={C},r2={r2}")
+    training_accuracy.append(clf.score(X_train, y_train))
+    test_accuracy.append(clf.score(X_test, y_test))
+
+plt.plot(c_values, training_accuracy, label="training accuracy")
+plt.plot(c_values, test_accuracy, label="test accuracy")
+plt.xscale("log")  # better visualization for C
+plt.ylabel("Accuracy")
+plt.xlabel("C")
+plt.legend()
+plt.show()
